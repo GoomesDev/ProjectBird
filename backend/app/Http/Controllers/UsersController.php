@@ -4,62 +4,103 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Users;
+use Illuminate\Support\Facades\Auth;
 
 class UsersController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
     public function index()
     {
-        //
+        $allUsers = Users::get();
+
+        return $allUsers;
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
+    public function create(Request $request)
     {
-        //
+        $username = $request->input('name');
+        $password = $request->input('password');
+        
+        $existingUser = Users::where('name', $username)->first();
+
+        if($existingUser) {
+            return response()->json(['message' => 'User already exist'], 401);
+        }
+
+        $user = Users::create([
+            'name' => $username,
+            'password' => bcrypt($password)
+        ]);
+
+        if($user) {
+            return response()->json(['message' => 'User registered successfully.']);
+        }
+
+        return response()->json(['message' => 'An error occurred while registering the user.'], 401);
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(Request $request)
+    public function login(Request $request)
     {
-        //
+        $username = $request->input('name');
+        $password = $request->input('password');
+
+        $user = Users::where('name', $username)->first();
+
+        if($user && password_verify($password, $user->password)){
+            return response()->json([
+                'message' => 'Successful login.',
+                'user_id' => $user->id
+            ], 200);
+        }
+
+        return response()->json(['message' => 'Incorrect username or password.
+        '], 401);
     }
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(string $id)
+    public function show($userId)
     {
-        //
+        $user = Users::select(['name', 'created_at'])->find($userId);
+
+        if (!$user) {
+            return response()->json(['message' => 'User not found.'], 404);
+        }
+
+        return $user;
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(string $id)
+    public function update(Request $request, $userId)
     {
-        //
+        $newUsername = $request->input('name');
+        $newPassword = $request->input('password');
+
+        $user = Users::find($userId);
+        if(!$user){
+            return response()->json(['message' => 'User not found.'], 404);
+        }
+
+        if($newUsername != $user->name) {
+            $existingUser = Users::where('name', $newUsername)->first();
+            if($existingUser) {
+                return response()->json(['message' => 'Username already exists.'], 401);
+            }
+        }
+
+        $user->name = $newUsername;
+        $user->password = bcrypt($newPassword);
+        $user->save();
+
+        return response()->json(['message' => 'User updated successfully.']);
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, string $id)
+    public function destroy($userId)
     {
-        //
-    }
+        $user = Users::where('id', $userId)->delete();
 
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(string $id)
-    {
-        //
+        if($user){
+          return response()->json(['message' => 'User deleted successfully.
+        ']);
+        }
+
+        return response()->json(['message' => 'An error occurred while deleting the user.
+        ']);
     }
 }

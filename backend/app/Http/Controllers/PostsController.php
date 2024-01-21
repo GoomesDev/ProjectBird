@@ -12,7 +12,9 @@ class PostsController extends Controller
      */
     public function index()
     {
-        //
+        $allPosts = Posts::get();
+        
+        return $allPosts;
     }
 
     /**
