@@ -7,61 +7,69 @@ use App\Models\Posts;
 
 class PostsController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
     public function index()
     {
-        $allPosts = Posts::get();
+        $allPosts = Posts::orderBy('created_at', 'DESC')
+        ->paginate(15);
         
         return $allPosts;
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
+    public function create(Request $request, $userId)
     {
-        //
+        $title = $request->input('title');
+        $content = $request->input('content');
+
+        if($title && $content) {
+            $post = Posts::create([
+                'title' => $title,
+                'content' => $content,
+                'user_id' => $userId,
+            ]);
+
+            return response()->json(['message' => 'Posted!']);
+        }
+
+        return response()->json(['message' => 'Something wrong happened.']);
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(Request $request)
+    public function show($postId)
     {
-        //
+        $post = Posts::select('title', 'content')->find($postId);
+
+        if($post) {
+            return $post;
+        }
+
+        return response()->json(['message' => 'Post not exist.']);
     }
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(string $id)
+    public function edit(Request $request, $postId)
     {
-        //
+        $title = $request->input('title');
+        $content = $request->input('content');
+
+        $post = Posts::find($postId);
+
+        if(!$post){
+            return response()->json(['message' => 'Post not exist.']);
+        }
+
+        $post->title = $title;
+        $post->content = $content;
+        $post->save();
+
+        return response()->json(['message' => 'Post edited succesfully.']);
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(string $id)
+    public function destroy($postId)
     {
-        //
-    }
+        $post = Posts::find($postId)->delete();
 
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, string $id)
-    {
-        //
-    }
+        if($post) {
+            return response()->json(['message' => 'Post deleted!']);
+        }
 
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(string $id)
-    {
-        //
+        return response()->json(['message' => 'Something wrong happened.']);
     }
 }

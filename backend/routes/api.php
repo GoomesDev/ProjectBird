@@ -14,4 +14,8 @@ Route::group(["prefix" => "account"], function() {
 
 Route::group(["prefix" => "feed"], function() {
     Route::resource('posts', 'App\Http\Controllers\PostsController');
+    Route::post('create/{userId}', 'App\Http\Controllers\PostsController@create');
+    Route::get('show/{postId}', 'App\Http\Controllers\PostsController@show');
+    Route::delete('delete/{postId}', 'App\Http\Controllers\PostsController@destroy');
+    Route::put('edit/{postId}', 'App\Http\Controllers\PostsController@edit');
 });

@@ -1,11 +1,11 @@
-import { Paper } from "@mui/material"
+import {Paper} from "@mui/material"
+import '/app/globals.css'
+import Login from "@/components/Login/Login"
 
 const LoginPage = () => {
-
+    
     return (
-        <Paper>
-            <h1>Teste</h1>
-        </Paper>
+        <Login />
     )
 }
 
