@@ -8,6 +8,7 @@ function createWindow() {
   mainWindow = new BrowserWindow({
     width: 800,
     height: 600,
+    icon: path.join(app.getAppPath(), 'frontend', 'public', 'logo.png'),
     webPreferences: {
       nodeIntegration: true,
     },

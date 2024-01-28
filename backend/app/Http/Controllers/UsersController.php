@@ -20,6 +20,10 @@ class UsersController extends Controller
         $username = $request->input('name');
         $password = $request->input('password');
         
+        if (empty($password) || empty($username)) {
+            return response()->json(['message' => 'Password is required.'], 400);
+        }
+
         $existingUser = Users::where('name', $username)->first();
 
         if($existingUser) {
@@ -32,10 +36,10 @@ class UsersController extends Controller
         ]);
 
         if($user) {
-            return response()->json(['message' => 'User registered successfully.']);
+            return response()->json(['message' => 'User registered successfully.'], 200);
         }
 
-        return response()->json(['message' => 'An error occurred while registering the user.'], 401);
+        return response()->json(['message' => 'An error occurred while registering the user.'], 500);
     }
 
     public function login(Request $request)
