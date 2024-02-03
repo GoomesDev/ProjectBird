@@ -28,7 +28,6 @@ const Login = () => {
     }
 
     const hideContainer = () => {
-        console.log('Dentro:', name)
         setContainerClass('hidden')
         router.push({
             pathname: '/feed',
@@ -57,8 +56,6 @@ const Login = () => {
                 body: JSON.stringify({name, password})
             })
             if(res.status === 200) {
-                // setResult('Login successful! Redirecting.')
-                // setAlertOpen(true)
                 setPermission(true)
                 hideContainer()
             } else if(res.status === 401) {

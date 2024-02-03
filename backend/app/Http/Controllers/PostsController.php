@@ -4,27 +4,29 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Posts;
+use App\Models\Users;
 
 class PostsController extends Controller
 {
     public function index()
     {
         $allPosts = Posts::orderBy('created_at', 'DESC')
+        ->with('user')
         ->paginate(15);
         
         return $allPosts;
     }
 
-    public function create(Request $request, $userId)
+    public function create(Request $request, $name)
     {
-        $title = $request->input('title');
         $content = $request->input('content');
 
-        if($title && $content) {
+        $user = Users::where('name', $name)->first();
+
+        if($content) {
             $post = Posts::create([
-                'title' => $title,
                 'content' => $content,
-                'user_id' => $userId,
+                'user_id' => $user->id,
             ]);
 
             return response()->json(['message' => 'Posted!']);
@@ -35,7 +37,7 @@ class PostsController extends Controller
 
     public function show($postId)
     {
-        $post = Posts::select('title', 'content')->find($postId);
+        $post = Posts::select('content')->find($postId);
 
         if($post) {
             return $post;
@@ -46,7 +48,6 @@ class PostsController extends Controller
 
     public function edit(Request $request, $postId)
     {
-        $title = $request->input('title');
         $content = $request->input('content');
 
         $post = Posts::find($postId);
@@ -55,7 +56,6 @@ class PostsController extends Controller
             return response()->json(['message' => 'Post not exist.']);
         }
 
-        $post->title = $title;
         $post->content = $content;
         $post->save();
 

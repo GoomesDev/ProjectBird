@@ -6,9 +6,9 @@ let mainWindow;
 
 function createWindow() {
   mainWindow = new BrowserWindow({
-    width: 800,
+    width: 900,
     height: 600,
-    icon: path.join(app.getAppPath(), 'frontend', 'public', 'logo.png'),
+    icon: path.join(app.getAppPath(), 'public', 'logoApp.png'),
     webPreferences: {
       nodeIntegration: true,
     },
