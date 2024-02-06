@@ -9,10 +9,17 @@ import {
     AuthorContainer,
     ContentContainer,
     SearchBtn,
-    PostHeader
+    PostHeader,
+    LogoContainer,
+    Title,
+    OptionsContainer,
+    OptionBtn
 } from "./styledComponents"
 import { useRouter } from "next/router"
 import SendIcon from '@mui/icons-material/Send'
+import DeleteIcon from '@mui/icons-material/Delete'
+import EditIcon from '@mui/icons-material/Edit'
+import Image from 'next/image'
 
 const Feed = () => {
     const route = process.env.NEXT_PUBLIC_API_URL
@@ -53,21 +60,47 @@ const Feed = () => {
     const handleFormSubmit = (e) => {
         e.preventDefault()
         submitPost()
-      }
+    }
 
-    console.log(content)
-    console.log(posts)
+    const delPost = async(row) => {
+        try {
+            let url = route + `feed/delete/${row.id}`
+            const res = await fetch(url, {
+                method: 'DELETE',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+            })
+            if(res.status === 200) {
+                getPosts()
+            }
+        } catch {
+            console.log('deu merda')
+        }
+        
+    }
 
     useEffect(() => {
         getPosts()
     }, [])
-
+    
+    console.log(content)
+    console.log(posts)
     return (
         <Container>
             {auth ? (
                 <>
                     <LeftContainer>
-                        Logo + Project Bird
+                        <LogoContainer>
+                            <Image
+                            src="/logo.png"
+                            alt="Vercel Logo"
+                            width={36}
+                            height={36}
+                            priority
+                            />
+                            <Title>Project<Title style={{color: '#fff'}}>Bird</Title></Title>
+                        </LogoContainer>
                         <br />
                         Profile, etc.
                     </LeftContainer>
@@ -95,6 +128,19 @@ const Feed = () => {
                                 <PostContainer key={row.id}>
                                     <AuthorContainer>
                                         <b>{row.user.name}</b>
+                                        {auth === row.user.name && 
+                                            <OptionsContainer>
+                                                <OptionBtn>
+                                                    <EditIcon fontSize="small"/>
+                                                </OptionBtn>
+                                                <OptionBtn
+                                                    onClick={() => delPost(row)}
+                                                >
+                                                    <DeleteIcon fontSize="small"/>
+                                                </OptionBtn>                                               
+                                            </OptionsContainer>
+                                        }
+
                                     </AuthorContainer>
                                     <ContentContainer>{row.content}</ContentContainer>
                                 </PostContainer>

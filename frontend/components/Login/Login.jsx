@@ -18,7 +18,6 @@ const Login = () => {
     const route = process.env.NEXT_PUBLIC_API_URL
     const [name, setName] = useState('')
     const [password, setPassword] = useState('')
-    const [permission, setPermission] = useState(false)
     const [alertOpen, setAlertOpen] = useState(false)
     const [result, setResult] = useState()
     const [containerClass, setContainerClass] = useState('visible')
@@ -56,7 +55,6 @@ const Login = () => {
                 body: JSON.stringify({name, password})
             })
             if(res.status === 200) {
-                setPermission(true)
                 hideContainer()
             } else if(res.status === 401) {
                 setResult('Incorrect username or password!')
@@ -82,7 +80,7 @@ const Login = () => {
             if(res.status === 200) {
                 setResult('User registered successfully! Redirecting.')
                 setAlertOpen(true)
-                setPermission(true)
+                hideContainer()
             } else if(res.status === 401) {
                 setResult('User already exist.')
                 setAlertOpen(true)
